@@ -1,65 +1,65 @@
 import cv2
 import os
+import numpy as np
+
+PARAM_BLUR = (7, 7)
+PARAM_ADAPTIVE_BLOCK = 11
+PARAM_ADAPTIVE_C = 4
+
 
 folder_path = 'dataset/train'
-image_name_list = []
-for file_name in range(1, 16):
-    if file_name >= 10:
-        image_name_list.append(f'{file_name}.jpg')
-    else:
-        image_name_list.append(f'0{file_name}.jpg')
 
-image_name = image_name_list[14]
-full_path = os.path.join(folder_path, image_name)
 
-def mk_images(original_image):
+def image_processor(original_image):
     gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
     soft_blur = cv2.GaussianBlur(gray_image, (5, 5), 0)
-    (T, binary_image) = cv2.threshold(soft_blur, 160, 255, cv2.THRESH_BINARY)
-    (contours, hierarchy) = cv2.findContours(binary_image.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    binary = cv2.adaptiveThreshold(soft_blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, PARAM_ADAPTIVE_BLOCK, PARAM_ADAPTIVE_C)
+    kernel = np.ones((3, 3), np.uint8)
+    clean_binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+
+    (contours, _) = cv2.findContours(clean_binary.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    return clean_binary, contours
+
+
 
 
 # everything written here above is just to organize better the image distribution
 
 # dealing with processing the images:
 
-original_image = cv2.imread(full_path)
 
-# simple error handling:
+def main():
 
-if original_image is None:
-    print(f'não foi possível encontrar a imgem no caminho {full_path}\n')
-    print(f'tentando substituir o .jpg por .png:\n')
-    image_name = image_name.replace('.jpg', '.png')
+    # simple error handling:
+
+    try:
+        nomes_arquivos = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
+        if not nomes_arquivos:
+            print("Nenhuma imagem foi encontrada")
+
+    except FileNotFoundError:
+        print(f'Erro: O diretório {folder_path} não foi encontrado.')
+
+    image_name = nomes_arquivos[3] #change here the index of the images !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     full_path = os.path.join(folder_path, image_name)
     original_image = cv2.imread(full_path)
-    if original_image is None:
-        raise FileNotFoundError(f'Imagem não encontrada no caminho {full_path}, verifique se o arquivo existe.\n')
-    else:
-        # I need to correct this ASAP!! Making 2 times the same thing is not efficient
-        gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
-        soft_blur = cv2.GaussianBlur(gray_image, (5, 5), 0)
-        binary_image = cv2.adaptiveThreshold(soft_blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, \
-                                         cv2.THRESH_BINARY_INV, 11, 4)
-        (contours, hierarchy) = cv2.findContours(binary_image.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-else:
-    gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
-    soft_blur = cv2.GaussianBlur(gray_image, (7, 7), 0)
-    binary_image = cv2.adaptiveThreshold(soft_blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, \
-                                     cv2.THRESH_BINARY_INV, 11, 4)
-    (contours, hierarchy) = cv2.findContours(binary_image.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
 
-countours_image = original_image.copy()
-cv2.drawContours(countours_image, contours, -1, (0, 255, 0), 2)
+    binary_image, contours = image_processor(original_image)
 
-cv2.imshow('Imagem original:', original_image)
-# cv2.imshow('Imagem em tons de cinza:', gray_image)
-# cv2.imshow('Imagem com desfoque:', soft_blur)
-cv2.imshow('Imagem Binarizadas:', binary_image)
-cv2.imshow('Imagem com Contornos:', countours_image)
+    countours_image = original_image.copy()
+    cv2.drawContours(countours_image, contours, -1, (0, 255, 0), 2)
 
-print("Aperte qualquer tecla para fechar as janelas")
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    cv2.imshow('Imagem original:', original_image)
+    # cv2.imshow('Imagem em tons de cinza:', gray_image)
+    # cv2.imshow('Imagem com desfoque:', soft_blur)
+    cv2.imshow('Imagem Binarizadas:', binary_image)
+    cv2.imshow('Imagem com Contornos:', countours_image)
+
+    print("Aperte qualquer tecla para fechar as janelas")
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
