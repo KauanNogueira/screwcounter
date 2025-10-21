@@ -2,13 +2,11 @@ import cv2
 import os
 import numpy as np
 
-PARAM_BLUR = (7, 7)
 PARAM_ADAPTIVE_BLOCK = 11
 PARAM_ADAPTIVE_C = 4
-
-
 folder_path = 'dataset/train'
 
+# dealing with processing the images:
 
 def image_processor(original_image):
     gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
@@ -21,27 +19,19 @@ def image_processor(original_image):
 
     return clean_binary, contours
 
-
-
-
-# everything written here above is just to organize better the image distribution
-
-# dealing with processing the images:
-
-
 def main():
 
     # simple error handling:
 
     try:
-        nomes_arquivos = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
-        if not nomes_arquivos:
+        file_names = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
+        if not file_names:
             print("Nenhuma imagem foi encontrada")
 
     except FileNotFoundError:
         print(f'Erro: O diretório {folder_path} não foi encontrado.')
 
-    image_name = nomes_arquivos[3] #change here the index of the images !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    image_name = file_names[13] #change here the index of the images !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     full_path = os.path.join(folder_path, image_name)
     original_image = cv2.imread(full_path)
 
@@ -52,9 +42,7 @@ def main():
     cv2.drawContours(countours_image, contours, -1, (0, 255, 0), 2)
 
     cv2.imshow('Imagem original:', original_image)
-    # cv2.imshow('Imagem em tons de cinza:', gray_image)
-    # cv2.imshow('Imagem com desfoque:', soft_blur)
-    cv2.imshow('Imagem Binarizadas:', binary_image)
+    cv2.imshow('Imagem Binarizada:', binary_image)
     cv2.imshow('Imagem com Contornos:', countours_image)
 
     print("Aperte qualquer tecla para fechar as janelas")
