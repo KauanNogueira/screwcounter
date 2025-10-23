@@ -8,6 +8,8 @@ import joblib
 INPUT_CSV_FILE = 'treino_classificado.csv'
 OUTPUT_MODEL_FILE = 'screw_classifier_model.pkl'
 
+
+# simple error handling
 try:
     data = pd.read_csv(INPUT_CSV_FILE)
 except FileNotFoundError:
@@ -15,7 +17,7 @@ except FileNotFoundError:
     print("Execute primeiro o '1_data_collector.py' para gerar os dados.")
     exit()
 
-if len(data) < 20: # Aumentar o mínimo para um resultado mais confiável
+if len(data) < 20: # increase the minimum
     print(f"Aviso: O arquivo CSV tem poucos dados ({len(data)} linhas). O modelo pode não ser preciso.")
 
 X = data[['area', 'aspect_ratio', 'extent', 'solidity']]
@@ -43,3 +45,4 @@ print(classification_report(y_test, y_pred, target_names=['Nao Parafuso', 'Paraf
 
 joblib.dump(model, OUTPUT_MODEL_FILE)
 print(f"\nModelo salvo com sucesso como '{OUTPUT_MODEL_FILE}'!")
+
