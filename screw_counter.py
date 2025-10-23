@@ -1,6 +1,8 @@
-# Salve como 3_screw_counter.py
+# This is the last part of the project, and it is responsible for counting screws in a given image using the screw_classifier_model.pkl trained model. 
+# Wich was trained with the data collected in data_collector.py and the model trained in train.py. 
+# This script loads the image and the model
+
 import cv2
-import os
 import numpy as np
 import joblib
 from scipy import ndimage
@@ -15,7 +17,7 @@ WATERSHED_MIN_DIST = 32
 
 # config
 MODEL_FILE = 'screw_classifier_model.pkl'
-IMAGE_TO_TEST = 'dataset/test/20.jpg' 
+IMAGE_TO_TEST = 'dataset/test/20.jpg' # change image here!!!!!!!!
 MIN_CONTOUR_AREA = 100
 
 def apply_processing(image):
@@ -82,7 +84,10 @@ def main():
         else:
             cv2.drawContours(result_image, [cnt], -1, (0, 0, 255), 2)
 
-    text = f"Parafusos encontrados: {screw_count}"
+
+    text = f"Parafusos encontrados: {(screw_count/11)*6}"
+    # I'd like to highlight this one. The model works by couting countours in an image, and there are a lot of screws that can have more than 2 countours. This 'magic number' is in fact just a weighted average with the probabilities of a screw having 1, 2 or 3 countours.
+
     print(text)
     cv2.putText(result_image, text, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
     cv2.imshow('Resultado Final', result_image)
