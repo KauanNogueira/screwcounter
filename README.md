@@ -8,10 +8,10 @@ This project was developed as a technical demonstration of skills in computer vi
 
 ## Key Features
 
-* **Robust Object Segmentation:** Implements a sophisticated pipeline to isolate objects even in challenging conditions.
+* **Object Segmentation:** Implements a good pipeline to isolate objects even in challenging conditions.
 * **Intelligent Object Separation:** Utilizes the Watershed algorithm to correctly separate touching or overlapping screws.
 * **Custom Machine Learning Model:** A `RandomForestClassifier` is trained on custom-labeled data to distinguish between "screws" and "non-screws" (e.g., noise, logos, segmentation artifacts).
-* **Interactive Data Collection Tool:** Includes a custom-built tool (`1_data_collector.py`) with a GUI for efficient and high-quality data labeling, allowing for real-time parameter tuning to ensure optimal segmentation for each training image.
+* **Interactive Data Collection Tool:** This is the part where I actually spent the most time on: A custom-built tool (`1_data_collector.py`) with a GUI for efficient and high-quality data labeling, allowing for real-time parameter tuning to ensure optimal segmentation for each training image. Since I was trying to do this from scratch, I wasn't planning on using labelimg or other software that could go in the opposite direction of the project, so I did it my own.
 
 ---
 
@@ -40,7 +40,7 @@ To get a local copy up and running, follow these simple steps.
 
 1.  Clone the repo:
     ```sh
-    git clone (https://github.com/KauanTavares/screw_counter.git)
+    git clone (https://github.com/KauanNogueira/screwcounter.git)
     ```
 2.  Navigate to the project directory:
     ```sh
@@ -57,20 +57,22 @@ The project is divided into three main scripts, intended to be run in order:
 
 1.  **Collect Data (Optional - a sample `treino_classificado.csv` is provided):**
     The interactive tool allows you to create your own dataset. For each image in `dataset/train`, you can adjust segmentation parameters for optimal quality and then label the resulting objects.
+
+    This was one of the things I would like to improve in the future, since it's the main reason the results are not quite aligned with the reality
     ```sh
-    python 1_data_collector.py
+    python data_collector.py
     ```
 
 2.  **Train the Model:**
     This script reads the `treino_classificado.csv`, trains the model, evaluates its performance, and saves the trained model to `screw_classifier_model.pkl`.
     ```sh
-    python 2_train_model.py
+    python train_model.py
     ```
 
 3.  **Run the Counter:**
     This is the final application. It loads an image from the `dataset/test` folder and the trained model to perform the final count.
     ```sh
-    python 3_screw_counter.py
+    python screw_counter.py
     ```
     *Note: Remember to change the `IMAGE_TO_TEST` variable inside the script to your desired test image.*
 
